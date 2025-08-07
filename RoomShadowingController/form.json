@@ -1,0 +1,38 @@
+{
+    "elements": [
+		{
+			"type": "SelectVariable",
+			"name": "GlobalShadowingStatusVariable",
+			"caption": "Global Shadowing Status Variable",
+			"width": "400px"
+		},
+		{
+			"type": "SelectVariable",
+			"name": "InputTemperatureCurrentVariable",
+			"caption": "Input Temperature Current Variable",
+			"width": "400px"
+		},
+		{
+			"type": "SelectVariable",
+			"name": "InputTemperatureTargetVariable",
+			"caption": "Input Temperature Target Variable",
+			"width": "400px"
+		},
+		{ 
+			"type": "CheckBox", 
+			"name": "EnableRoomShadowingByTemperature", 
+			"caption": "Enable Room-Shadowing by Temperature" 
+		}
+    ],
+    "actions": [
+        {
+            "type": "TestCenter"
+        },
+		{
+		"type":  "RowLayout",
+		"items": [
+			{"type": "Button", "caption": "Create Automatic", "onClick": "RSC_ImportFromCurrentRoom($id);"}
+		]
+		}
+    ]
+}

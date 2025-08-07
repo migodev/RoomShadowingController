@@ -1,0 +1,14 @@
+{
+    "id": "{A94C75FF-0BEF-4F61-BFCC-AE3C134CC6CA}",
+    "name": "Room Shadowing Controller",
+    "type": 3,
+    "vendor": "",
+    "aliases": [
+        "Room Shadowing Controller"
+    ],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "RSC",
+    "url": "https://github.com/migodev/RoomShadowingController"
+}
