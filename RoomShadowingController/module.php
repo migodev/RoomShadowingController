@@ -145,22 +145,31 @@ class RoomShadowingController extends IPSModule {
         foreach ($childs as $child) {
             $ch = IPS_GetObject($child);
             if ($ch['ObjectType'] != 1) { continue; }
-            
+
             $ch = IPS_GetInstance($child);
             if ($ch['ModuleInfo']['ModuleID'] == '{7C25F5A6-ED34-4FB4-8A6D-D49DFE636CDC}') {
                 // FHK14 found
-                $varIst = @IPS_GetVariableIDByName('Ist-Temperatur', $child);
-                $varSoll = @IPS_GetVariableIDByName('Sollwert (Thermostat)', $child);
-                if ($varIst === false || $varSoll === false) {
+                $InstanceChilds = IPS_GetChildrenIDs($ch['InstanceID']); //Search for Variables with Current & Target Temperature
+                $varCurrent = false;
+                $varTarget = false; 
+                foreach ($InstanceChilds as $ic) {
+                    $name = IPS_GetName($ic);
+                    if (preg_match("/Ist-Temperatur/", $name)) {
+                        $varCurrent = $ic;
+                        continue;
+                    }
+                    if (preg_match("/\(Thermostat\)/", $name)) {
+                        $varTarget = $ic;
+                        continue;
+                    }
+                }
+                if ($varCurrent === false || $varTarget === false) {
                     throw new Exception('Ist/Soll Temperatur variables not found in FHK14');
                 }
                 
                 // Update form fields with found variables
-                $this->UpdateFormField('InputTemperatureCurrentVariable', 'value', $varIst);
-                $this->UpdateFormField('InputTemperatureTargetVariable', 'value', $varSoll);
-                
-                // Apply changes
-                $this->ApplyChanges();
+                $this->UpdateFormField('InputTemperatureCurrentVariable', 'value', $varCurrent);
+                $this->UpdateFormField('InputTemperatureTargetVariable', 'value', $varTarget);
                 
                 return;
             }
