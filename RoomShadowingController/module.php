@@ -143,6 +143,9 @@ class RoomShadowingController extends IPSModule {
         $parent = IPS_GetParent($this->InstanceID);
         $childs = IPS_GetChildrenIDs ($parent);
         foreach ($childs as $child) {
+            $ch = IPS_GetObject($child);
+            if ($ch['ObjectType'] != 1) { continue; }
+            
             $ch = IPS_GetInstance($child);
             if ($ch['ModuleInfo']['ModuleID'] == '{7C25F5A6-ED34-4FB4-8A6D-D49DFE636CDC}') {
                 // FHK14 found
