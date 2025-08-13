@@ -94,11 +94,12 @@ class RoomShadowingController extends IPSModule {
                 $this->SetActive(true);
                 return true;
             }
-        }
-
-        if ($globalShadowingStatus === false) {
-            $this->SetActive(false);
-            return false;
+            
+            // Disable Status only when global Status was changed
+            if ($globalShadowingStatus === false) {
+                $this->SetActive(false);
+                return false;
+            }
         }
 
         // Exit if we don't want temperature based shadowing
