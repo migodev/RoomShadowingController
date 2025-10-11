@@ -234,9 +234,12 @@ class RoomShadowingController extends IPSModule {
             $childs = IPS_GetChildrenIDs($ch[0]);
             foreach ($childs as $child) {
                 $name = IPS_GetName($child);
-                if ($name == "Temperatur") {
+                if (preg_match("/Temperatur AVG/i", $name)) {
                     $this->UpdateFormField('InputOutdoorTemperature', 'value', $child);
                     break;
+                } elseif ($name == "Temperatur") {
+                    // Fallback if AVG Variable is not present
+                    $this->UpdateFormField('InputOutdoorTemperature', 'value', $child);
                 }
             }
         }
