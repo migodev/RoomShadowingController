@@ -42,7 +42,7 @@ Es wird eine Statusvariable angelegt
 Name                  | Typ					| Funktion
 --------------------- | ------------------- | -------------------
 Raum Beschattung aktiv | Boolean		| Aktiviert bzw. Deaktiviert die Statusvariable für die Beschattung in der Instanz
-Beschattung bei Kälte | Boolean         | Ist diese Funktion aktiviert, wird die Beschattung automatisch deaktiviert, wenn die Außentemperatur unter den Schwellwert fällt.
+Beschattung bei Kälte | Boolean         | Deaktiviert: Außentemperatur wird ignoriert, Aktiviert: Sobald die Außentemperatur unter den Schwellwert fällt, wird die Beschattung deaktiviert bzw. wieder aktiviert, wenn es wärmer wird.
 
 ### 6. Konfiguration
 
