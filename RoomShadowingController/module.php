@@ -131,7 +131,7 @@ class RoomShadowingController extends IPSModule {
         }
 
         // Check Outdoor Temperature
-        if (($this->GetValue('ColdShadowing') === true) && ($this->ReadPropertyInteger('InputOutdoorTemperature') > 1)) {
+        if (($this->GetValue('ColdShadowing') === false) && ($this->ReadPropertyInteger('InputOutdoorTemperature') > 1)) {
             $outdoorTemp = floatval(GetValue($this->ReadPropertyInteger('InputOutdoorTemperature')));
             $threshold = $this->ReadPropertyFloat('ThresholdTemperature');
             if ($outdoorTemp < $threshold) {
