@@ -6,7 +6,10 @@
             "Input Temperature Current Variable": "Variable für aktuelle Raumtemperatur",
             "Input Temperature Target Variable": "Variable für Ziel Raumtemperatur",
             "Enable Room-Shadowing by Temperature": "Raum-Beschattung nach Innen-Temperatur aktivieren",
-            "Create Automatic": "Automatisch zuordnen"
+            "Create Automatic": "Automatisch zuordnen (nur für Eltako FHK14 & FWS61/FWG14)",
+            "Temperature outdoor threshold": "Schwellwert für Außentemperatur",
+            "Input Outdoor Temperature Variable": "Variable für Außentemperatur",
+            "Current/Target Temperatur variables not found in FHK14": "Ist/Soll Temperatur Variablen wurden nicht gefunden im FHK14"
         }
     }
 }

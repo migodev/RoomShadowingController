@@ -22,6 +22,26 @@
 			"type": "CheckBox", 
 			"name": "EnableRoomShadowingByTemperature", 
 			"caption": "Enable Room-Shadowing by Temperature" 
+		},
+		{ 
+			"type": "Label", 
+			"caption": "   " 
+		},
+		{ 
+			"type": "HorizontalSlider", 
+			"name": "ThresholdTemperature", 
+			"caption": "Temperature outdoor threshold", 
+			"minimum": 0, 
+			"maximum": 20, 
+			"stepSize": 0.5,
+			"suffix": " Grad Celsius",
+			"displayValue": true
+		},
+		{
+			"type": "SelectVariable",
+			"name": "InputOutdoorTemperature",
+			"caption": "Input Outdoor Temperature Variable",
+			"width": "400px"
 		}
     ],
     "actions": [

@@ -17,6 +17,7 @@ Damit wird der Raum erst dann beschattet, wenn die Soll-Temperatur erreicht ist.
 ### 1. Funktionsumfang
 
 * Überwacht die Innentemperatur mit Soll & Ist sowie den globalen Beschattungsstatus.
+* Kann optional auch bei Kälte die Beschattung deaktivieren
 
 ### 2. Voraussetzungen
 
@@ -39,7 +40,8 @@ Es wird eine Statusvariable angelegt
 
 Name                  | Typ					| Funktion
 --------------------- | ------------------- | -------------------
-Raum Beschattung aktiv | Boolean		| Zeigt den Status an, ob die Beschattung aktiv/inaktiv für den Raum ist
+Raum Beschattung aktiv | Boolean		| Aktiviert bzw. Deaktiviert die Statusvariable für die Beschattung in der Instanz
+Beschattung bei Kälte | Boolean         | Ist diese Funktion aktiviert, wird die Beschattung automatisch deaktiviert, wenn die Außentemperatur unter den Schwellwert fällt.
 
 ### 6. Konfiguration
 
@@ -49,12 +51,14 @@ Raum Beschattung aktiv | Boolean		| Zeigt den Status an, ob die Beschattung akti
 | Variable für aktuelle Raumtemperatur                  | integer | 0            | Die Variable welche die aktuelle Ist-Temperatur speichert. |
 | Variable für Ziel Raumtemperatur                      | integer | 0            | Die Variable welche die aktuelle Soll-Temperatur speichert. |
 | Raum-Beschattung nach Innen-Temperatur aktivieren     | boolean | true         | Aktiviert die Innenraum Temperatur-Steuerung, ist der Schalter deaktiviert, synchronisiert sich der Status der Instanz nur mit der globalen Variable. |
+| Schwellwert für Außentemperatur                       | integer | 10           | Definiert den Schwellwert ab wann die Beschattung von wegen Kälte deaktiviert wird. |
+| Variable für Außentemperatur                          | integer | 0            | Kann jede beliebige Variable sein, welche eine Außentemperatur abbildet. In der automatischen Zuordnung wird hier eine Eltako Wetterstation gesucht und hinterlegt. |
 | <em>Action-Center</em>                                |  		  |              |  														 |
 | Automatisch Zuordnen                                  |         |              | Via Klick wird die globale Beschattungs-Steuerung Variable gesucht sowie im aktuellen Raum das Eltako FHK14 und die Variablen automatisch vorbefüllt. |
 
 ### 7. Visualisierung
 
-Das Modul bietet keine Funktion in der Visualisierung.
+Das Modul bietet in der Visualisierung die Möglichkeit den Modus sowie die Beschattung bei Kälte an & auszuschalten.
 
 ### 8. PHP-Befehlsreferenz
 

@@ -13,6 +13,10 @@ class RoomShadowingController extends IPSModule {
         $this->RegisterPropertyInteger('GlobalShadowingStatusVariable', 0);
         $this->RegisterPropertyBoolean('EnableRoomShadowingByTemperature', true);
        
+        #$this->RegisterPropertyBoolean('DisableShadowingColdTemperature', true);
+        $this->RegisterPropertyFloat('ThresholdTemperature', 10);
+        $this->RegisterPropertyInteger('InputOutdoorTemperature', 0);
+
         //Variables
         $ActiveOptions = json_encode([
             [
@@ -31,6 +35,10 @@ class RoomShadowingController extends IPSModule {
         ]);    
         $this->RegisterVariableBoolean('Active', 'Raum Beschattung aktiv', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'power-off', 'OPTIONS' => $ActiveOptions]);
         $this->EnableAction('Active');
+
+        $this->RegisterVariableBoolean('ColdShadowing', 'Beschattung bei Kälte', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'snowflake', 'OPTIONS' => $ActiveOptions]);
+        $this->EnableAction('ColdShadowing');
+        $this->SetValue("ColdShadowing", true); // Default true
     }
     
 
@@ -56,6 +64,10 @@ class RoomShadowingController extends IPSModule {
             $this->RegisterMessage($this->ReadPropertyInteger("InputTemperatureCurrentVariable"), VM_UPDATE);
             $this->RegisterReference($this->ReadPropertyInteger("InputTemperatureCurrentVariable"));
         }
+        if ($this->ReadPropertyInteger("InputOutdoorTemperature") > 0) {
+            $this->RegisterMessage($this->ReadPropertyInteger("InputOutdoorTemperature"), VM_UPDATE);
+            $this->RegisterReference($this->ReadPropertyInteger("InputOutdoorTemperature"));
+        }
         if ($this->ReadPropertyInteger("InputTemperatureTargetVariable") > 0) {
             $this->RegisterReference($this->ReadPropertyInteger("InputTemperatureTargetVariable"));
         }
@@ -74,10 +86,19 @@ class RoomShadowingController extends IPSModule {
         }
     }
 
+    public function SetColdShadowing(bool $Value) {
+        if ($this->GetValue('ColdShadowing') !== $Value) {
+            $this->SetValue('ColdShadowing', $Value);
+        }
+    }
+
     public function RequestAction($Ident, $Value) {
         switch ($Ident) {
             case 'Active':
                 $this->SetActive($Value);
+                break;
+            case 'ColdShadowing':
+                $this->SetColdShadowing($Value);
                 break;
             default:
                 throw new Exception('Invalid ident');
@@ -110,9 +131,20 @@ class RoomShadowingController extends IPSModule {
             return false;
         }
 
+        // Check Outdoor Temperature
+        if ($this->GetValue('ColdShadowing') === true) {
+        #if ($this->ReadPropertyBoolean('DisableShadowingColdTemperature') === true) {
+            $outdoorTemp = floatval(GetValue($this->ReadPropertyInteger('InputOutdoorTemperature')));
+            $threshold = $this->ReadPropertyFloat('ThresholdTemperature');
+            if ($outdoorTemp < $threshold) {
+                $this->SetActive(false);
+                return false;
+            }
+        }
+
         $curTemp = floatval(GetValue($this->ReadPropertyInteger('InputTemperatureCurrentVariable')));
         $tarTemp = floatval(GetValue($this->ReadPropertyInteger('InputTemperatureTargetVariable')));
-
+        
         if ($curTemp >= $tarTemp) {
             $this->SetActive(true);
         } elseif ($curTemp < $tarTemp) {
@@ -122,12 +154,14 @@ class RoomShadowingController extends IPSModule {
 
     public function ImportFromCurrentRoom() {
         // find General Category & identify Bool Variable for global shadowing
-        $cat = IPS_GetCategoryList ();
+        $foundGeneralCategory = false;
+        $cat = IPS_GetCategoryList();
         foreach ($cat as $c) {
             $catInfo = IPS_GetObject($c);
             if ($catInfo['ObjectName'] == 'Beschattung') {
                 $pc = IPS_GetObject(IPS_GetParent($catInfo['ObjectID']));
                 if ($pc['ObjectName'] == "Allgemein") {
+                    $foundGeneralCategory = true;
                     $ShadowingCatId = $catInfo['ObjectID'];
                     break;
                 }
@@ -135,7 +169,28 @@ class RoomShadowingController extends IPSModule {
         }
         $varBeschattungsID = @IPS_GetVariableIDByName('Aktivierung globale Beschattung', $ShadowingCatId);
         if ($varBeschattungsID === false) {
-            throw new Exception('Globale Beschattung variable not found in symcon');
+            // Creates Category & Global Variable
+            if ($foundGeneralCategory === false) {
+                $CatID = IPS_CreateCategory();
+                IPS_SetName($CatID, "Allgemein");
+                IPS_SetParent($CatID, 0);
+
+                $CatID_BS = IPS_CreateCategory();
+                IPS_SetName($CatID_BS, "Beschattung");
+                IPS_SetParent($CatID_BS, $CatID);
+            }
+            //Create Bool Variable
+            $varBeschattungsID = IPS_CreateVariable(0);
+            IPS_SetName($varBeschattungsID, "Aktivierung globale Beschattung");
+            IPS_SetVariableCustomPresentation($varBeschattungsID, ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'power-off']);
+            IPS_SetParent($varBeschattungsID, $CatID_BS);
+            
+            //Create Default Action Script
+            $ScriptID = IPS_CreateScript(0);
+            IPS_SetName($ScriptID, "Aktionsskript");
+            IPS_SetScriptContent($ScriptID, "<?php SetValue(\$_IPS['VARIABLE'], \$_IPS['VALUE']); ?>");
+            IPS_SetParent($ScriptID, $varBeschattungsID);
+            IPS_SetVariableCustomAction($varBeschattungsID, $ScriptID);
         }
         $this->UpdateFormField('GlobalShadowingStatusVariable', 'value', $varBeschattungsID);
         
@@ -158,20 +213,33 @@ class RoomShadowingController extends IPSModule {
                         $varCurrent = $ic;
                         continue;
                     }
-                    if (preg_match("/\(Thermostat\)/", $name)) {
+                    if (preg_match("/\Sollwert/", $name) && !preg_match("/\(Thermostat\)/", $name)) {
                         $varTarget = $ic;
                         continue;
                     }
                 }
                 if ($varCurrent === false || $varTarget === false) {
-                    throw new Exception('Ist/Soll Temperatur variables not found in FHK14');
+                    throw new Exception($this->Translate('Current/Target Temperatur variables not found in FHK14'));
                 }
                 
                 // Update form fields with found variables
                 $this->UpdateFormField('InputTemperatureCurrentVariable', 'value', $varCurrent);
                 $this->UpdateFormField('InputTemperatureTargetVariable', 'value', $varTarget);
                 
-                return;
+                break;
+            }
+        }
+
+        // find Eltako Weatherstation
+        $ch = IPS_GetInstanceListByModuleID('{9E4572C0-C306-4F00-B536-E75B4950F094}');
+        if (count($ch) > 0) {
+            $childs = IPS_GetChildrenIDs($ch[0]);
+            foreach ($childs as $child) {
+                $name = IPS_GetName($child);
+                if ($name == "Temperatur") {
+                    $this->UpdateFormField('InputOutdoorTemperature', 'value', $child);
+                    break;
+                }
             }
         }
     }
