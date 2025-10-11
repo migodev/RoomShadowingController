@@ -1,6 +1,7 @@
 # Raum Beschattungs-Steuerung
 Das Modul erlaubt es auf Basis der Innentemperatur eines Raumes eine Steuervariable zu schalten, um darüber die Beschattung des Raumes zu ermöglichen.
 Damit wird der Raum erst dann beschattet, wenn die Soll-Temperatur erreicht ist.
+Weiterhin ist optional auch die Beschattung bei Kälte auszusetzen, bis es wieder wärmer ist.
 
 ### Inhaltsverzeichnis
 
