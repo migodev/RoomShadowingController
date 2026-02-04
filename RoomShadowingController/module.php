@@ -121,15 +121,6 @@ class RoomShadowingController extends IPSModule {
             return false;
         }
 
-        // Exit if we don't want temperature based shadowing
-        if ($this->ReadPropertyBoolean('EnableRoomShadowingByTemperature') === false) {
-            return false;
-        }
-
-        if (($this->ReadPropertyInteger('InputTemperatureCurrentVariable') <= 1) || ($this->ReadPropertyInteger('InputTemperatureTargetVariable') <= 1)) {
-            return false;
-        }
-
         // Check Outdoor Temperature
         if (($this->GetValue('ColdShadowing') === false) && ($this->ReadPropertyInteger('InputOutdoorTemperature') > 1)) {
             $outdoorTemp = floatval(GetValue($this->ReadPropertyInteger('InputOutdoorTemperature')));
@@ -138,6 +129,15 @@ class RoomShadowingController extends IPSModule {
                 $this->SetActive(false);
                 return false;
             }
+        }
+
+        // Exit if we don't want temperature based shadowing
+        if ($this->ReadPropertyBoolean('EnableRoomShadowingByTemperature') === false) {
+            return false;
+        }
+
+        if (($this->ReadPropertyInteger('InputTemperatureCurrentVariable') <= 1) || ($this->ReadPropertyInteger('InputTemperatureTargetVariable') <= 1)) {
+            return false;
         }
 
         $curTemp = floatval(GetValue($this->ReadPropertyInteger('InputTemperatureCurrentVariable')));
