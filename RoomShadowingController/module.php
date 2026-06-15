@@ -129,10 +129,13 @@ class RoomShadowingController extends IPSModule {
     private function validateShadowing($data, $senderId) {
         //Exit if global shadowing is disabled
         $globalShadowingStatus = GetValue($this->ReadPropertyInteger('GlobalShadowingStatusVariable'));
+        $this->SendDebug('globalShadowingStatus', json_encode($globalShadowingStatus), 0);
+        $this->SendDebug('EvaluationIndoorTemperature', json_encode($this->GetValue('EvaluationIndoorTemperature')), 0);
 
         if ($senderId == $this->ReadPropertyInteger('GlobalShadowingStatusVariable')) {
             if (($globalShadowingStatus === true) && ($this->GetValue('EvaluationIndoorTemperature') === false)) {
                 // Activate only if global Status = true and RoomControl = false, otherwise enablement is controlled via Temperature Rule
+                $this->SendDebug('status', "enabled by globalShadowingStatus and EvaluationIndoorTemperature = false", 0);
                 $this->SetActive(true);
                 return true;
             }
@@ -140,6 +143,7 @@ class RoomShadowingController extends IPSModule {
 
         if ($globalShadowingStatus === false) {
             $this->SetActive(false);
+            $this->SendDebug('status', "disabled by globalShadowingStatus", 0);
             return false;
         }
 
@@ -149,16 +153,19 @@ class RoomShadowingController extends IPSModule {
             $threshold = $this->ReadPropertyFloat('ThresholdTemperature');
             if ($outdoorTemp < $threshold) {
                 $this->SetActive(false);
+                $this->SendDebug('status', "disabled by ColdShadowing", 0);
                 return false;
             }
         }
 
         // Exit if we don't want temperature based shadowing
         if ($this->GetValue('EvaluationIndoorTemperature') === false) {
+            $this->SendDebug('exit', "EvaluationIndoorTemperature is false", 0);
             return false;
         }
 
         if (($this->ReadPropertyInteger('InputTemperatureCurrentVariable') <= 1) || ($this->ReadPropertyInteger('InputTemperatureTargetVariable') <= 1)) {
+            $this->SendDebug('exit', "input indoor Tempereratures are not set", 0);
             return false;
         }
 
@@ -167,8 +174,10 @@ class RoomShadowingController extends IPSModule {
         
         if ($curTemp >= $tarTemp) {
             $this->SetActive(true);
+            $this->SendDebug('status', "disabled by Indoor Temperature", 0);
         } elseif ($curTemp < $tarTemp) {
             $this->SetActive(false);
+            $this->SendDebug('status', "enabled by Indoor Temperature", 0);
         }
     }
 
@@ -200,6 +209,7 @@ class RoomShadowingController extends IPSModule {
                 IPS_SetParent($CatID_BS, $CatID);
             } else {
                 $CatID_BS = $ShadowingCatId; // Category already exists, only Variable is missing
+                $this->SendDebug('import', "Category already exists, only Variable was missing", 0);
             }
             //Create Bool Variable
             $varBeschattungsID = IPS_CreateVariable(0);
