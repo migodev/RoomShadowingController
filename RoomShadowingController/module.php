@@ -11,7 +11,7 @@ class RoomShadowingController extends IPSModule {
         $this->RegisterPropertyInteger('InputTemperatureCurrentVariable', 0);
         $this->RegisterPropertyInteger('InputTemperatureTargetVariable', 0);
         $this->RegisterPropertyInteger('GlobalShadowingStatusVariable', 0);
-        $this->RegisterPropertyBoolean('EnableRoomShadowingByTemperature', true);
+        //$this->RegisterPropertyBoolean('EnableRoomShadowingByTemperature', true);
        
         $this->RegisterPropertyFloat('ThresholdTemperature', 10);
         $this->RegisterPropertyInteger('InputOutdoorTemperature', 0);
@@ -37,9 +37,22 @@ class RoomShadowingController extends IPSModule {
 
         $this->RegisterVariableBoolean('ColdShadowing', 'Beschattung bei Kälte', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'snowflake', 'OPTIONS' => $ActiveOptions]);
         $this->EnableAction('ColdShadowing');
-        $this->SetValue("ColdShadowing", true); // Default true
+        //$this->SetValue("ColdShadowing", true); // Default true
+
+        $this->RegisterVariableBoolean('EvaluationIndoorTemperature', 'Auswertung Innentemperaturen', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'temperature-high', 'OPTIONS' => $ActiveOptions]);
+        $this->EnableAction('EvaluationIndoorTemperature');
+        //$this->SetValue("EvaluationIndoorTemperature", false); // Default false
     }
     
+    public function Migrate($JSONData) {
+        parent::Migrate($JSONData);
+
+        $data = json_decode($JSONData);
+        if (isset($data->configuration->EnableRoomShadowingByTemperature)) {
+            $this->SetValue("EvaluationIndoorTemperature", $data->configuration->EnableRoomShadowingByTemperature);
+        }
+        return json_encode($data);
+    }
 
     public function ApplyChanges() {
         parent::ApplyChanges();
@@ -91,6 +104,12 @@ class RoomShadowingController extends IPSModule {
         }
     }
 
+    public function SetEvaluationIndoorTemperature(bool $Value) {
+        if ($this->GetValue('EvaluationIndoorTemperature') !== $Value) {
+            $this->SetValue('EvaluationIndoorTemperature', $Value);
+        }
+    }
+
     public function RequestAction($Ident, $Value) {
         switch ($Ident) {
             case 'Active':
@@ -98,6 +117,9 @@ class RoomShadowingController extends IPSModule {
                 break;
             case 'ColdShadowing':
                 $this->SetColdShadowing($Value);
+                break;
+            case 'EvaluationIndoorTemperature':
+                $this->SetEvaluationIndoorTemperature($Value);
                 break;
             default:
                 throw new Exception('Invalid ident');
@@ -107,9 +129,9 @@ class RoomShadowingController extends IPSModule {
     private function validateShadowing($data, $senderId) {
         //Exit if global shadowing is disabled
         $globalShadowingStatus = GetValue($this->ReadPropertyInteger('GlobalShadowingStatusVariable'));
-       
+
         if ($senderId == $this->ReadPropertyInteger('GlobalShadowingStatusVariable')) {
-            if (($globalShadowingStatus === true) && ($this->ReadPropertyBoolean('EnableRoomShadowingByTemperature') === false)) {
+            if (($globalShadowingStatus === true) && ($this->GetValue('EvaluationIndoorTemperature') === false)) {
                 // Activate only if global Status = true and RoomControl = false, otherwise enablement is controlled via Temperature Rule
                 $this->SetActive(true);
                 return true;
@@ -132,7 +154,7 @@ class RoomShadowingController extends IPSModule {
         }
 
         // Exit if we don't want temperature based shadowing
-        if ($this->ReadPropertyBoolean('EnableRoomShadowingByTemperature') === false) {
+        if ($this->GetValue('EvaluationIndoorTemperature') === false) {
             return false;
         }
 
@@ -176,6 +198,8 @@ class RoomShadowingController extends IPSModule {
                 $CatID_BS = IPS_CreateCategory();
                 IPS_SetName($CatID_BS, "Beschattung");
                 IPS_SetParent($CatID_BS, $CatID);
+            } else {
+                $CatID_BS = $ShadowingCatId; // Category already exists, only Variable is missing
             }
             //Create Bool Variable
             $varBeschattungsID = IPS_CreateVariable(0);

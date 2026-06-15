@@ -19,11 +19,6 @@
 			"width": "400px"
 		},
 		{ 
-			"type": "CheckBox", 
-			"name": "EnableRoomShadowingByTemperature", 
-			"caption": "Enable Room-Shadowing by Temperature" 
-		},
-		{ 
 			"type": "Label", 
 			"caption": "   " 
 		},
