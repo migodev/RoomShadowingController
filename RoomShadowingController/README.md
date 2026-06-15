@@ -43,6 +43,7 @@ Name                  | Typ					| Funktion
 --------------------- | ------------------- | -------------------
 Raum Beschattung aktiv | Boolean		| Aktiviert bzw. Deaktiviert die Statusvariable für die Beschattung in der Instanz
 Beschattung bei Kälte | Boolean         | Deaktiviert: Außentemperatur wird ignoriert, Aktiviert: Sobald die Außentemperatur unter den Schwellwert fällt, wird die Beschattung deaktiviert bzw. wieder aktiviert, wenn es wärmer wird.
+Auswertung Innentemperaturen | Boolean         | Aktiviert die Innenraum Temperatur-Steuerung, ist der Schalter deaktiviert, synchronisiert sich der Status der Instanz nur mit der globalen Variable.
 
 ### 6. Konfiguration
 
@@ -51,7 +52,6 @@ Beschattung bei Kälte | Boolean         | Deaktiviert: Außentemperatur wird ig
 | Variable für globalen Beschattungsstatus              | integer | 0            | Die globale Variable die die globale Beschattung steuert. In der Regel unter Allgemein/Beschattung/Aktivierung globale Beschattung |
 | Variable für aktuelle Raumtemperatur                  | integer | 0            | Die Variable welche die aktuelle Ist-Temperatur speichert. |
 | Variable für Ziel Raumtemperatur                      | integer | 0            | Die Variable welche die aktuelle Soll-Temperatur speichert. |
-| Raum-Beschattung nach Innen-Temperatur aktivieren     | boolean | true         | Aktiviert die Innenraum Temperatur-Steuerung, ist der Schalter deaktiviert, synchronisiert sich der Status der Instanz nur mit der globalen Variable. |
 | Schwellwert für Außentemperatur                       | integer | 10           | Definiert den Schwellwert ab wann die Beschattung von wegen Kälte deaktiviert wird. |
 | Variable für Außentemperatur                          | integer | 0            | Kann jede beliebige Variable sein, welche eine Außentemperatur abbildet. In der automatischen Zuordnung wird hier eine Eltako Wetterstation gesucht und hinterlegt. |
 | <em>Action-Center</em>                                |  		  |              |  														 |
