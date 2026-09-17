@@ -46,7 +46,7 @@
 		{
 		"type":  "RowLayout",
 		"items": [
-			{"type": "Button", "caption": "Create Automatic", "onClick": "RSC_ImportFromCurrentRoom($id);"}
+			{"type": "Button", "caption": "Create Automatic", "onClick": "RSC_ImportFromCurrentRoom($id);", "confirm": "Warning: This process will create categories at the top level of your object tree and add control variables there. Continue?"}
 		]
 		}
     ]
