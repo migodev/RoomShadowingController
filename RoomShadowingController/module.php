@@ -200,9 +200,11 @@ class RoomShadowingController extends IPSModuleStrict {
         if ($curTemp >= $tarTemp) {
             $this->SetActive(true);
             $this->SendDebug('status', "enabled by Indoor Temperature", 0);
+            return true;
         } elseif ($curTemp < $tarTemp) {
             $this->SetActive(false);
             $this->SendDebug('status', "disabled by Indoor Temperature", 0);
+            return false;
         }
     }
 
