@@ -2,6 +2,7 @@
 Das Modul erlaubt es auf Basis der Innentemperatur eines Raumes eine Steuervariable zu schalten, um darüber die Beschattung des Raumes zu ermöglichen.
 Damit wird der Raum erst dann beschattet, wenn die Soll-Temperatur erreicht ist.
 Weiterhin ist optional auch die Beschattung bei Kälte auszusetzen, bis es wieder wärmer ist.
+Die Automatische Steuerung kann über eine Steuervariable aktiviert/deaktiviert werden.
 
 ### Inhaltsverzeichnis
 
@@ -41,9 +42,10 @@ Es wird eine Statusvariable angelegt
 
 Name                  | Typ					| Funktion
 --------------------- | ------------------- | -------------------
-Raum Beschattung aktiv | Boolean		| Aktiviert bzw. Deaktiviert die Statusvariable für die Beschattung in der Instanz
-Beschattung bei Kälte | Boolean         | Deaktiviert: Außentemperatur wird ignoriert, Aktiviert: Sobald die Außentemperatur unter den Schwellwert fällt, wird die Beschattung deaktiviert bzw. wieder aktiviert, wenn es wärmer wird.
-Auswertung Innentemperaturen | Boolean         | Aktiviert die Innenraum Temperatur-Steuerung, ist der Schalter deaktiviert, synchronisiert sich der Status der Instanz nur mit der globalen Variable.
+Raum Beschattung aktiv  | Boolean		    | Aktiviert bzw. Deaktiviert die Statusvariable für die Beschattung in der Instanz
+Beschattung bei Kälte   | Boolean           | Deaktiviert: Außentemperatur wird ignoriert, Aktiviert: Sobald die Außentemperatur unter den Schwellwert fällt, wird die Beschattung deaktiviert bzw. wieder aktiviert, wenn es wärmer wird.
+Auswertung Innentemperaturen | Boolean      | Aktiviert die Innenraum Temperatur-Steuerung, ist der Schalter deaktiviert, synchronisiert sich der Status der Instanz nur mit der globalen Variable.
+Automatische Steuerung |Boolean             | Aktiviert/Deaktivierung die automatische Steuerung auf Basis der innen/außen Temperaturen. Wenn Deaktiviert, kann die "Raum Beschattung aktiv" Variable manuell gesteuert werden.
 
 ### 6. Konfiguration
 

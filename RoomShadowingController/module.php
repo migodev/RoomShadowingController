@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-class RoomShadowingController extends IPSModule {
+class RoomShadowingController extends IPSModuleStrict {
     
-    public function Create() {
+    public function Create(): void {
         parent::Create();
         
         //Properties
@@ -32,19 +32,25 @@ class RoomShadowingController extends IPSModule {
                 'Color' => 0xff0000
             ]
         ]);    
-        $this->RegisterVariableBoolean('Active', 'Raum Beschattung aktiv', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'power-off', 'OPTIONS' => $ActiveOptions]);
+        $this->RegisterVariableBoolean('Active', 'Raum Beschattung aktiv', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'power-off', 'OPTIONS' => $ActiveOptions], 1);
         $this->EnableAction('Active');
 
-        $this->RegisterVariableBoolean('ColdShadowing', 'Beschattung bei Kälte', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'snowflake', 'OPTIONS' => $ActiveOptions]);
+        $createAutomaticControl = $this->RegisterVariableBoolean('AutomaticControl', 'Automatische Steuerung', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'power-off', 'OPTIONS' => $ActiveOptions], 2);
+        if ($createAutomaticControl) {
+            $this->SetValue("AutomaticControl", true);
+        }
+        $this->EnableAction('AutomaticControl');
+
+        $this->RegisterVariableBoolean('ColdShadowing', 'Beschattung bei Kälte', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'snowflake', 'OPTIONS' => $ActiveOptions], 3);
         $this->EnableAction('ColdShadowing');
         //$this->SetValue("ColdShadowing", true); // Default true
 
-        $this->RegisterVariableBoolean('EvaluationIndoorTemperature', 'Auswertung Innentemperaturen', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'temperature-high', 'OPTIONS' => $ActiveOptions]);
+        $this->RegisterVariableBoolean('EvaluationIndoorTemperature', 'Auswertung Innentemperaturen', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'temperature-high', 'OPTIONS' => $ActiveOptions], 4);
         $this->EnableAction('EvaluationIndoorTemperature');
         //$this->SetValue("EvaluationIndoorTemperature", false); // Default false
     }
     
-    public function Migrate($JSONData) {
+    public function Migrate(string $JSONData): string {
         parent::Migrate($JSONData);
 
         $data = json_decode($JSONData);
@@ -54,7 +60,7 @@ class RoomShadowingController extends IPSModule {
         return json_encode($data);
     }
 
-    public function ApplyChanges() {
+    public function ApplyChanges(): void {
         parent::ApplyChanges();
         
         //Unregister all messages
@@ -85,35 +91,44 @@ class RoomShadowingController extends IPSModule {
         }
     }
     
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data) {
+    public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
         //https://www.symcon.de/en/service/documentation/developer-area/sdk-tools/sdk-php/messages/
         if ($Message == VM_UPDATE) {          
             $this->validateShadowing($Data[0], $SenderID);
         }
     }
     
-    public function SetActive(bool $Value) {
+    public function SetActive(bool $Value): void {
         if ($this->GetValue('Active') !== $Value) {
             $this->SetValue('Active', $Value);
         }
     }
 
-    public function SetColdShadowing(bool $Value) {
+    public function SetAutomaticControl(bool $Value): void {
+        if ($this->GetValue('AutomaticControl') !== $Value) {
+            $this->SetValue('AutomaticControl', $Value);
+        }
+    }
+
+    public function SetColdShadowing(bool $Value): void {
         if ($this->GetValue('ColdShadowing') !== $Value) {
             $this->SetValue('ColdShadowing', $Value);
         }
     }
 
-    public function SetEvaluationIndoorTemperature(bool $Value) {
+    public function SetEvaluationIndoorTemperature(bool $Value): void {
         if ($this->GetValue('EvaluationIndoorTemperature') !== $Value) {
             $this->SetValue('EvaluationIndoorTemperature', $Value);
         }
     }
 
-    public function RequestAction($Ident, $Value) {
+    public function RequestAction(string $Ident, mixed $Value): void {
         switch ($Ident) {
             case 'Active':
                 $this->SetActive($Value);
+                break;
+            case 'AutomaticControl':
+                $this->SetAutomaticControl($Value);
                 break;
             case 'ColdShadowing':
                 $this->SetColdShadowing($Value);
@@ -126,11 +141,16 @@ class RoomShadowingController extends IPSModule {
         }
     }
 
-    private function validateShadowing($data, $senderId) {
+    private function validateShadowing(mixed $data, int $senderId): bool {
         //Exit if global shadowing is disabled
         $globalShadowingStatus = GetValue($this->ReadPropertyInteger('GlobalShadowingStatusVariable'));
         $this->SendDebug('globalShadowingStatus', json_encode($globalShadowingStatus), 0);
         $this->SendDebug('EvaluationIndoorTemperature', json_encode($this->GetValue('EvaluationIndoorTemperature')), 0);
+
+        if ($this->GetValue('AutomaticControl') === false) {
+            $this->SendDebug('automatic-control', "automatic-control is disabled and exit", 0);
+            return false;
+        }
 
         if ($senderId == $this->ReadPropertyInteger('GlobalShadowingStatusVariable')) {
             if (($globalShadowingStatus === true) && ($this->GetValue('EvaluationIndoorTemperature') === false)) {
@@ -186,7 +206,7 @@ class RoomShadowingController extends IPSModule {
         }
     }
 
-    public function ImportFromCurrentRoom() {
+    public function ImportFromCurrentRoom(): void {
         // find General Category & identify Bool Variable for global shadowing
         $foundGeneralCategory = false;
         $cat = IPS_GetCategoryList();

@@ -48,6 +48,17 @@
 		"items": [
 			{"type": "Button", "caption": "Create Automatic", "onClick": "RSC_ImportFromCurrentRoom($id);", "confirm": "Warning: This process will create categories at the top level of your object tree and add control variables there. Continue?"}
 		]
-		}
+		},
+        {
+            "type": "ExpansionPanel",
+            "caption": "Source code and licence",
+            "items": [
+                {
+                    "type": "Label",
+                    "caption": "The software is free of charge for non-commercial use",
+                    "bold": true
+                }
+            ]
+        }
     ]
 }

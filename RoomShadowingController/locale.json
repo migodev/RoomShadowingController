@@ -10,7 +10,9 @@
             "Temperature outdoor threshold": "Schwellwert für Außentemperatur",
             "Input Outdoor Temperature Variable": "Variable für Außentemperatur",
             "Current/Target Temperatur variables not found in FHK14": "Ist/Soll Temperatur Variablen wurden nicht gefunden im FHK14",
-            "Warning: This process will create categories at the top level of your object tree and add control variables there. Continue?": "Achtung: Dieser Vorgang erstellt Kategorien auf der Hauptebene Ihres Objekbaumes und legt dort Steuerungsvariablen an. Fortfahren?"
+            "Warning: This process will create categories at the top level of your object tree and add control variables there. Continue?": "Achtung: Dieser Vorgang erstellt Kategorien auf der Hauptebene Ihres Objekbaumes und legt dort Steuerungsvariablen an. Fortfahren?",
+            "Source code and licence": "Quellcode und Lizenz", 
+            "The software is free of charge for non-commercial use": "Die Software ist für die nicht kommerzielle Nutzung kostenlos"
         }
     }
 }
