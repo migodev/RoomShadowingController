@@ -147,11 +147,6 @@ class RoomShadowingController extends IPSModuleStrict {
         $this->SendDebug('globalShadowingStatus', json_encode($globalShadowingStatus), 0);
         $this->SendDebug('EvaluationIndoorTemperature', json_encode($this->GetValue('EvaluationIndoorTemperature')), 0);
 
-        if ($this->GetValue('AutomaticControl') === false) {
-            $this->SendDebug('automatic-control', "automatic-control is disabled and exit", 0);
-            return false;
-        }
-
         if ($senderId == $this->ReadPropertyInteger('GlobalShadowingStatusVariable')) {
             if (($globalShadowingStatus === true) && ($this->GetValue('EvaluationIndoorTemperature') === false)) {
                 // Activate only if global Status = true and RoomControl = false, otherwise enablement is controlled via Temperature Rule
@@ -164,6 +159,11 @@ class RoomShadowingController extends IPSModuleStrict {
         if ($globalShadowingStatus === false) {
             $this->SetActive(false);
             $this->SendDebug('status', "disabled by globalShadowingStatus", 0);
+            return false;
+        }
+
+        if ($this->GetValue('AutomaticControl') === false) {
+            $this->SendDebug('automatic-control', "automatic-control is disabled and exit", 0);
             return false;
         }
 
