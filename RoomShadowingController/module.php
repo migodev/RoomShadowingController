@@ -20,7 +20,7 @@ class RoomShadowingController extends IPSModuleStrict {
         $ActiveOptions = json_encode([
             [
                 'Value' => true,
-                'Caption' => 'Automatik',
+                'Caption' => 'Aktiviert',
                 'IconActive' => false,
                 'Icon' => '',
                 'Color' => 0x00ff00
@@ -31,7 +31,7 @@ class RoomShadowingController extends IPSModuleStrict {
                 'Icon' => '',
                 'Color' => 0xff0000
             ]
-        ]);    
+        ]); 
         $this->RegisterVariableBoolean('Active', 'Raum Beschattung aktiv', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'power-off', 'OPTIONS' => $ActiveOptions], 1);
         $this->EnableAction('Active');
 
