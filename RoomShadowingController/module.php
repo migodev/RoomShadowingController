@@ -22,13 +22,13 @@ class RoomShadowingController extends IPSModuleStrict {
                 'Value' => true,
                 'Caption' => 'Aktiviert',
                 'IconActive' => false,
-                'Icon' => '',
+                'IconValue' => '',
                 'Color' => 0x00ff00
             ],[
                 'Value' => false,
                 'Caption' => 'Deaktiviert',
                 'IconActive' => false,
-                'Icon' => '',
+                'IconValue' => '',
                 'Color' => 0xff0000
             ]
         ]); 
