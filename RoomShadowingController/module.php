@@ -11,7 +11,6 @@ class RoomShadowingController extends IPSModuleStrict {
         $this->RegisterPropertyInteger('InputTemperatureCurrentVariable', 0);
         $this->RegisterPropertyInteger('InputTemperatureTargetVariable', 0);
         $this->RegisterPropertyInteger('GlobalShadowingStatusVariable', 0);
-        //$this->RegisterPropertyBoolean('EnableRoomShadowingByTemperature', true);
        
         $this->RegisterPropertyFloat('ThresholdTemperature', 10);
         $this->RegisterPropertyInteger('InputOutdoorTemperature', 0);
@@ -36,18 +35,22 @@ class RoomShadowingController extends IPSModuleStrict {
         $this->EnableAction('Active');
 
         $createAutomaticControl = $this->RegisterVariableBoolean('AutomaticControl', 'Automatische Steuerung', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'power-off', 'OPTIONS' => $ActiveOptions], 2);
-        if ($createAutomaticControl) {
-            $this->SetValue("AutomaticControl", true);
-        }
         $this->EnableAction('AutomaticControl');
+        if ($createAutomaticControl) {
+            $this->SetValue("AutomaticControl", true); // Default true
+        }
 
-        $this->RegisterVariableBoolean('ColdShadowing', 'Beschattung bei Kälte', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'snowflake', 'OPTIONS' => $ActiveOptions], 3);
+        $createColdShadowing = $this->RegisterVariableBoolean('ColdShadowing', 'Beschattung bei Kälte', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'snowflake', 'OPTIONS' => $ActiveOptions], 3);
         $this->EnableAction('ColdShadowing');
-        //$this->SetValue("ColdShadowing", true); // Default true
+        if ($createColdShadowing) {
+            $this->SetValue("ColdShadowing", true); // Default true
+        }
 
-        $this->RegisterVariableBoolean('EvaluationIndoorTemperature', 'Auswertung Innentemperaturen', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'temperature-high', 'OPTIONS' => $ActiveOptions], 4);
+        $createEvaIndTemp = $this->RegisterVariableBoolean('EvaluationIndoorTemperature', 'Auswertung Innentemperaturen', ['PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION, 'ICON' => 'temperature-high', 'OPTIONS' => $ActiveOptions], 4);
         $this->EnableAction('EvaluationIndoorTemperature');
-        //$this->SetValue("EvaluationIndoorTemperature", false); // Default false
+        if ($createEvaIndTemp) {
+            $this->SetValue("EvaluationIndoorTemperature", false); // Default false
+        }
     }
     
     public function Migrate(string $JSONData): string {
@@ -168,9 +171,9 @@ class RoomShadowingController extends IPSModuleStrict {
         }
 
         // Check Outdoor Temperature
+        $threshold = $this->ReadPropertyFloat('ThresholdTemperature');
         if (($this->GetValue('ColdShadowing') === false) && ($this->ReadPropertyInteger('InputOutdoorTemperature') > 1)) {
             $outdoorTemp = floatval(GetValue($this->ReadPropertyInteger('InputOutdoorTemperature')));
-            $threshold = $this->ReadPropertyFloat('ThresholdTemperature');
             if ($outdoorTemp < $threshold) {
                 $this->SetActive(false);
                 $this->SendDebug('status', "disabled by ColdShadowing - Temperature (".$outdoorTemp.") below threshold (".$threshold.")", 0);
@@ -181,6 +184,12 @@ class RoomShadowingController extends IPSModuleStrict {
                     $this->SendDebug('status', "enabled by ColdShadowing - Temperature (".$outdoorTemp.") above threshold (".$threshold.")", 0);
                 }
             }
+        } elseif (($this->GetValue('ColdShadowing') === true) && ($this->ReadPropertyInteger('InputOutdoorTemperature') > 1)) {
+            if ($this->GetValue('EvaluationIndoorTemperature') === false) {
+                // Only if Indoor Temperature Check is not active
+                $this->SetActive(true);
+                $this->SendDebug('status', "enabled by ColdShadowing - Ignoring threshold (".$threshold.")", 0);
+            }  
         }
 
         // Exit if we don't want temperature based shadowing
