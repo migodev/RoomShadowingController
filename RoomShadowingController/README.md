@@ -23,7 +23,7 @@ Die Automatische Steuerung kann über eine Steuervariable aktiviert/deaktiviert 
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 8.0
+- IP-Symcon ab Version 8.1
 
 ### 3. Software-Installation
 
@@ -43,7 +43,7 @@ Es wird eine Statusvariable angelegt
 Name                  | Typ					| Funktion
 --------------------- | ------------------- | -------------------
 Raum Beschattung aktiv  | Boolean		    | Aktiviert bzw. Deaktiviert die Statusvariable für die Beschattung in der Instanz
-Beschattung bei Kälte   | Boolean           | Deaktiviert: Außentemperatur wird ignoriert, Aktiviert: Sobald die Außentemperatur unter den Schwellwert fällt, wird die Beschattung deaktiviert bzw. wieder aktiviert, wenn es wärmer wird.
+Beschattung bei Kälte   | Boolean           | Aktiviert: Außentemperatur wird ignoriert, Deaktiviert: Sobald die Außentemperatur unter den Schwellwert fällt, wird die Beschattung deaktiviert bzw. wieder aktiviert, wenn es wärmer wird.
 Auswertung Innentemperaturen | Boolean      | Aktiviert die Innenraum Temperatur-Steuerung, ist der Schalter deaktiviert, synchronisiert sich der Status der Instanz nur mit der globalen Variable.
 Automatische Steuerung |Boolean             | Aktiviert/Deaktivierung die automatische Steuerung auf Basis der innen/außen Temperaturen. Wenn Deaktiviert, kann die "Raum Beschattung aktiv" Variable manuell gesteuert werden.
 
